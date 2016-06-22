@@ -1,0 +1,31 @@
+{
+  "name": "zenefits-cli",
+  "version": "1.0.0",
+  "description": "Command-line interface to login, logout, start meal, and end meal in Zenefits.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bezhermoso/zenefits-cli.git"
+  },
+  "keywords": [
+    "zenefits"
+  ],
+  "author": "Bez Hermoso <bezalelhermoso@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bezhermoso/zenefits-cli/issues"
+  },
+  "homepage": "https://github.com/bezhermoso/zenefits-cli#readme",
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "chromedriver": "^2.21.2",
+    "minimist": "^1.2.0",
+    "selenium-webdriver": "^2.53.2"
+  },
+  "bin": {
+    "zenefits": "index.js"
+  }
+}
