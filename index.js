@@ -36,10 +36,11 @@ credentials().then(function (creds) {
   if (!username || !password) {
     console.error('Can\'t find your Zenefits credentials.');
     console.error('Either set the env variables ZENEFITS_USERNAME and ZENEFITS_PASSWORD in your shell, or save your credentials in ' + process.env.HOME + '/.zenefits.json as follows:');
+    console.error('');
     console.error(JSON.stringify({
       username: '<your username>',
       password: '<your password>'
-    }));
+    }, null, 2));
     process.exit(1);
   }
 
