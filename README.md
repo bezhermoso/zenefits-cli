@@ -39,4 +39,4 @@ zenefits endlunch
 
 ## @todos
 
-- [ ] Run in PhantomJS (no visible browser window). Work exists in the `phantomjs` branch.
+- [x] Run in PhantomJS (no visible browser window). Work exists in the `phantomjs` branch.
