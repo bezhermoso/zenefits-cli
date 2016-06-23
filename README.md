@@ -27,6 +27,7 @@ Create the file `~/.zenefits.json` containing the following:
     "password": "<your password>"
 }
 ```
+
 ## Commands
 
 ```
