@@ -3,12 +3,16 @@ var minimist = require('minimist'),
   webdriver = require('selenium-webdriver'),
   chrome = require('selenium-webdriver/chrome'),
   driverPath = require('chromedriver').path,
+  phantomjs = require('phantomjs-prebuilt'),
+  childProcess = require('child_process'),
   Zenefits = require('./lib/zenefits'),
   Promise = require('bluebird'),
   fs = Promise.promisifyAll(require('fs')),
   path = require('path');
 
 var credentialsFile = path.join(process.env.HOME, '.zenefits.json');
+
+var phantomPath = phantomjs.path;
 
 var argv = minimist(process.argv.slice(2));
 
@@ -28,8 +32,18 @@ var credentials = function () {
     });
 }
 
-credentials().then(function (creds) {
+var startServer = function () {
+  return new Promise(function (resolve, reject) {
+    childProcess.spawn(phantomPath, [
+      '--webdriver=4444', '--ignore-ssl-errors=true'
+    ]);
+    setTimeout(function () {
+      resolve('http://127.0.0.1:4444');
+    }, 2000);
+  });
+};
 
+credentials().then(function (creds) {
   var username = creds.username,
     password = creds.password;
 
@@ -44,31 +58,39 @@ credentials().then(function (creds) {
     process.exit(1);
   }
 
-  var service = new chrome.ServiceBuilder(driverPath).build();
-  chrome.setDefaultService(service);
+  //var service = new chrome.ServiceBuilder(driverPath).build();
+  //chrome.setDefaultService(service);
+  //
 
-  var driver = new webdriver.Builder()
-    .withCapabilities(webdriver.Capabilities.chrome())
-    .build();
-  var z = Zenefits(driver, username, password);
+  startServer().then(function (address) {
 
-  switch (action) {
-    case "in":
-      z.clockIn();
-      break;
-    case "out":
-      z.clockOut();
-      break;
-    case "lunch":
-      z.startMeal();
-      break;
-    case "endlunch":
-      z.endMeal();
-      break;
-    default:
-      console.error('Invalid input. Supported: `in`, `out`, `lunch`, and `endlunch`.');
-      process.exit(1);
-  }
+    console.log(address);
+    var driver = new webdriver.Builder()
+      .usingServer(address)
+      .withCapabilities({"browserName": "phantomjs"})
+      .build();
+
+    var z = Zenefits(driver, username, password);
+
+    switch (action) {
+      case "in":
+        z.clockIn();
+        break;
+      case "out":
+        z.clockOut();
+        break;
+      case "lunch":
+        z.startMeal();
+        break;
+      case "endlunch":
+        z.endMeal();
+        break;
+      default:
+        console.error('Invalid input. Supported: `in`, `out`, `lunch`, and `endlunch`.');
+        process.exit(1);
+    }
+  });
+
 }, function (e) {
   console.error(e);
   process.exit(1);
