@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 var minimist = require('minimist'),
   webdriver = require('selenium-webdriver'),
-  chrome = require('selenium-webdriver/chrome'),
-  driverPath = require('chromedriver').path,
   phantomjs = require('phantomjs-prebuilt'),
   childProcess = require('child_process'),
   Zenefits = require('./lib/zenefits'),
@@ -34,11 +32,14 @@ var credentials = function () {
 
 var startServer = function () {
   return new Promise(function (resolve, reject) {
-    childProcess.spawn(phantomPath, [
+    var process = childProcess.spawn(phantomPath, [
       '--webdriver=4444', '--ignore-ssl-errors=true'
     ]);
     setTimeout(function () {
-      resolve('http://127.0.0.1:4444');
+      resolve({
+        address: 'http://127.0.0.1:4444',
+        process: process
+      });
     }, 2000);
   });
 };
@@ -58,32 +59,31 @@ credentials().then(function (creds) {
     process.exit(1);
   }
 
-  //var service = new chrome.ServiceBuilder(driverPath).build();
-  //chrome.setDefaultService(service);
-  //
+  startServer().then(function (server) {
 
-  startServer().then(function (address) {
-
-    console.log(address);
     var driver = new webdriver.Builder()
-      .usingServer(address)
+      .usingServer(server.address)
       .withCapabilities({"browserName": "phantomjs"})
       .build();
 
     var z = Zenefits(driver, username, password);
 
+    var killChild = function () {
+      server.process.kill('SIGQUIT');
+    }
+
     switch (action) {
       case "in":
-        z.clockIn();
+        z.clockIn().then(killChild);
         break;
       case "out":
-        z.clockOut();
+        z.clockOut().then(killChild);
         break;
       case "lunch":
-        z.startMeal();
+        z.startMeal().then(killChild);
         break;
       case "endlunch":
-        z.endMeal();
+        z.endMeal().then(killChild);
         break;
       default:
         console.error('Invalid input. Supported: `in`, `out`, `lunch`, and `endlunch`.');
