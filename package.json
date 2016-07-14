@@ -1,6 +1,6 @@
 {
   "name": "zenefits-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Command-line interface to login, logout, start meal, and end meal in Zenefits.",
   "main": "index.js",
   "scripts": {

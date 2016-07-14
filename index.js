@@ -69,23 +69,30 @@ credentials().then(function (creds) {
       server.process.kill('SIGQUIT');
     }
 
+    var result = null;
+
     switch (action) {
       case "in":
-        z.clockIn().then(killChild);
+        result = z.clockIn();
         break;
       case "out":
-        z.clockOut().then(killChild);
+        result = z.clockOut();
         break;
       case "lunch":
-        z.startMeal().then(killChild);
+        result = z.startMeal();
         break;
       case "endlunch":
-        z.endMeal().then(killChild);
+        result = z.endMeal();
         break;
       default:
         console.error('Invalid input. Supported: `in`, `out`, `lunch`, and `endlunch`.');
         process.exit(1);
     }
+
+    result.then(console.log).then(killChild).then(function () {
+      process.exit(0);
+    });
+
   });
 
 }, function (e) {
